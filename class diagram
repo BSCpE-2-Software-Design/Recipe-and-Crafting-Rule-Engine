@@ -1,84 +1,47 @@
 ```mermaid
 ---
-config:
-  layout: elk
----
-flowchart TD
-    Item["<b>Item</b><br/>- itemId: 
-String<br/>- name: String<br/>- type: 
-String<br/>___<br/>+ getDetails()"]
-:::itemClass
+classDiagram
+    class Item {
+        +string id
+        +string name
+        +bool is_raw
+        +operator==()
+    }
     
-    Ingredient["<b>Ingredient</b><br/
->- quantity: int"]:::ingredientClass
+    class Recipe {
+        +Item output_item
+        +int output_qty
+        +unordered_map~Item,int~ inputs
+        +vector~Constraint~ constraints
+    }
     
-    Recipe["<b>Recipe</b><br/>- 
-recipeId: String<br/>- name: 
-String<br/>- isReversible: bool<br/
->___<br/>+ validate()<br/>+ 
-getIngredients()"]:::recipeClass
+    class Constraint {
+        +string type
+        +string value
+    }
     
-    CraftingConstraint
-["<b>CraftingConstraint</b><br/>- 
-toolRequired: String<br/>- 
-timeRequired: int<br/>- 
-sequenceOrder: int<br/>___<br/>+ 
-checkConstraint()"]:::constraintClass
+    class Inventory {
+        +unordered_map~Item,int~ items
+        +add(item, qty) bool
+        +remove(item, qty) bool
+        +has(item, qty) bool
+        +count(item) int
+    }
     
-    Inventory["<b>Inventory</b><br/>- 
-items: List&lt;Item&gt;<br/>___<br/>+ 
-addItem()<br/>+ removeItem()<br/>+ 
-hasItem()"]:::inventoryClass
-    
-    CraftingEngine
-["<b>CraftingEngine</b><br/>- 
-recipes: List&lt;Recipe&gt;<br/>- 
-inventory: Inventory<br/>___<br/>+ 
-craft(recipeId)<br/>+ validateRecipe()
-<br/>+ resolveDependencies()"]
-:::engineClass
-    
-    CraftingResult
-["<b>CraftingResult</b><br/>- 
-success: bool<br/>- message: 
-String<br/>- steps: List&lt;String&gt;
-<br/>___<br/>+ getSummary()"]
-:::resultClass
-    
-    Ingredient -->|inherits| Item
-    Recipe -->|contains many| 
-Ingredient
-    Recipe -->|produces| Item
-    Recipe -->|has many| 
-CraftingConstraint
-    CraftingEngine -->|uses| Recipe
-    CraftingEngine -->|manages| 
-Inventory
-    CraftingEngine -->|returns| 
-CraftingResult
-    
-    classDef itemClass stroke:#818cf8,
-fill:#eef2ff,color:#1e1b4b
-    classDef ingredientClass 
-stroke:#2dd4bf,fill:#f0fdfa,
-color:#1e1b4b
-    classDef recipeClass 
-stroke:#a78bfa,fill:#f5f3ff,
-color:#1e1b4b
-    classDef constraintClass 
-stroke:#fb923c,fill:#fff7ed,
-color:#1e1b4b
-    classDef inventoryClass 
-stroke:#22d3ee,fill:#ecfeff,
-color:#1e1b4b
-    classDef engineClass 
-stroke:#f87171,fill:#fef2f2,
-color:#1e1b4b
-    classDef resultClass 
-stroke:#4ade80,fill:#f0fdf4,
-color:#1e1b4b
-    classDef inheritArrow 
-stroke:#6b7280,fill:none
-    classDef relationArrow 
-stroke:#9ca3af,fill:none
+    class RuleEngine {
+        -unordered_map~Item,Recipe~ recipes
+        +addRecipe(recipe) void
+        +loadFromJson(path) void
+        +canCraft(item, inv) bool
+        +craft(item, inv) bool
+        +getSteps(item, inv) vector~string~
+        -canCraftRec() bool
+        -craftRec() bool
+    }
 
+    Recipe "1" *-- "1" Item : output
+    Recipe "1" *-- "1..*" Item : inputs
+    Recipe "1" *-- "0..*" Constraint
+    RuleEngine "1" o-- "0..*" Recipe
+    Inventory "1" o-- "0..*" Item
+    RuleEngine..> Inventory : uses

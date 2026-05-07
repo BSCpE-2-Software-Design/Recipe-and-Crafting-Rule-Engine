@@ -68,40 +68,31 @@ classDiagram
     CraftingEngine --> CraftingResult : returns
     Owner --> Recipe : creates
     Owner --> CraftingEngine : uses
-
-
-
 ```
+
 
 
 
 ```mermaid
 sequenceDiagram
-    participant O as Owner
-    participant CE as CraftingEngine
-    participant R as Recipe
-    participant C as CraftingConstraint
-    participant I as Inventory
-    participant CR as CraftingResult
+    participant User
+    participant CLI
+    participant RuleEngine
+    participant Inventory
 
-    P->>CE: craft(recipeId)
-    CE->>R: validate()
-    R-->>CE: Recipe valid
-
-    CE->>R: getIngredients()
-    R-->>CE: List of Ingredients
-
-    CE->>I: hasItem(Ingredients)
-    I-->>CE: Materials available
-
-    CE->>C: checkConstraint()
-    C-->>CE: Constraints satisfied
-
-    CE->>I: removeItem(Ingredients)
-    I-->>CE: Materials consumed
-
-    CE->>CR: Create CraftingResult(success, message, steps)
-    CR-->>P: getSummary()
-
-
-```
+    User->>CLI: craft iron_sword
+    CLI->>RuleEngine: craft(Item("iron_sword"), inv)
+    RuleEngine->>RuleEngine: canCraftRec(iron_sword, visited={})
+    RuleEngine->>RuleEngine: Check recipe: needs 2x iron_ingot, 1x stick
+    RuleEngine->>RuleEngine: canCraftRec(iron_ingot, visited={iron_sword})
+    RuleEngine->>RuleEngine: Check recipe: needs iron_ore + furnace
+    RuleEngine->>Inventory: has(furnace)? 
+    Inventory-->>RuleEngine: true
+    RuleEngine->>RuleEngine: canCraftRec(iron_ore, visited={iron_sword, iron_ingot})
+    RuleEngine-->>RuleEngine: true, it's raw
+    RuleEngine->>RuleEngine: craftRec(iron_ingot)
+    RuleEngine->>Inventory: remove(iron_ore), add(iron_ingot)
+    RuleEngine->>RuleEngine: craftRec(iron_sword)
+    RuleEngine->>Inventory: remove(2x iron_ingot, 1x stick), add(iron_sword)
+    RuleEngine-->>CLI: success
+    CLI-->>User: Crafted iron_sword

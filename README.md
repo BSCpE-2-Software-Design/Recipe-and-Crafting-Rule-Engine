@@ -96,3 +96,4 @@ sequenceDiagram
     RuleEngine->>Inventory: remove(2x iron_ingot, 1x stick), add(iron_sword)
     RuleEngine-->>CLI: success
     CLI-->>User: Crafted iron_sword
+```

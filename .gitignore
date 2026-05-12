@@ -1,7 +1,6 @@
- build/
-cmake-build-*/
-*.o
-*.exe
-*.out
 .vscode/
-.DS_Store
+*.exe
+*.o
+*.out
+recipe_app
+.DS_store

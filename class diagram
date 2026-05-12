@@ -1,47 +1,24 @@
 ```mermaid
 ---
 classDiagram
-    class Item {
-        +string id
-        +string name
-        +bool is_raw
-        +operator==()
-    }
-    
     class Recipe {
-        +Item output_item
-        +int output_qty
-        +unordered_map~Item,int~ inputs
-        +vector~Constraint~ constraints
+        -string name
+        -vector~string~ ingredients
+        -vector~string~ steps
+        +getName() string
+        +display() void
     }
-    
-    class Constraint {
-        +string type
-        +string value
+    class RecipeBook {
+        -vector~Recipe~ recipes
+        +addRecipe(Recipe r)
+        +findRecipe(string name) Recipe*
+        +loadDefaultRecipes()
+        +listAllRecipes()
     }
-    
-    class Inventory {
-        +unordered_map~Item,int~ items
-        +add(item, qty) bool
-        +remove(item, qty) bool
-        +has(item, qty) bool
-        +count(item) int
-    }
-    
     class RuleEngine {
-        -unordered_map~Item,Recipe~ recipes
-        +addRecipe(recipe) void
-        +loadFromJson(path) void
-        +canCraft(item, inv) bool
-        +craft(item, inv) bool
-        +getSteps(item, inv) vector~string~
-        -canCraftRec() bool
-        -craftRec() bool
+        -RecipeBook* book
+        +searchAndDisplay(string query)
     }
-
-    Recipe "1" *-- "1" Item : output
-    Recipe "1" *-- "1..*" Item : inputs
-    Recipe "1" *-- "0..*" Constraint
-    RuleEngine "1" o-- "0..*" Recipe
-    Inventory "1" o-- "0..*" Item
-    RuleEngine..> Inventory : uses
+    App --> RuleEngine
+    RuleEngine --> RecipeBook
+    RecipeBook "1" o-- "*" Recipe

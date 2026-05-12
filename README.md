@@ -1,5 +1,3 @@
-#Recipe-and-Crafting-Rule-Engine
-## Class Diagram
 ```mermaid
 classDiagram
     class Recipe {
@@ -23,8 +21,11 @@ classDiagram
     App --> RuleEngine
     RuleEngine --> RecipeBook
     RecipeBook "1" o-- "*" Recipe
-'''
+```
+
+```mermaid
 sequenceDiagram
+
     actor User
     User->>App: input "Chicken Adobo"
     App->>RuleEngine: searchAndDisplay()
@@ -33,3 +34,4 @@ sequenceDiagram
     RuleEngine->>Recipe: display()
     Recipe-->>User: show ingredients + steps
 
+```
